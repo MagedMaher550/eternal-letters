@@ -1,0 +1,358 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+@custom-variant light (&:is(.light *));
+
+:root {
+  /* Updated to use more vibrant light theme colors */
+  --background: #faf8f2;
+  --foreground: #1a0f08;
+  --card: #ffffff;
+  --card-foreground: #1a0f08;
+  --popover: #ffffff;
+  --popover-foreground: #1a0f08;
+  --primary: #d4af37;
+  --primary-foreground: #1a0f08;
+  --secondary: #f5f1e8;
+  --secondary-foreground: #1a0f08;
+  --muted: #f0ebe0;
+  --muted-foreground: #8b6914;
+  --accent: #daa520;
+  --accent-foreground: #1a0f08;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #d4af37;
+  --input: #ffffff;
+  --ring: #d4af37;
+  --chart-1: #d4af37;
+  --chart-2: #b8860b;
+  --chart-3: #daa520;
+  --chart-4: #ffd700;
+  --chart-5: #ffb347;
+  --radius: 0.625rem;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #1a0f08;
+  --sidebar-primary: #d4af37;
+  --sidebar-primary-foreground: #1a0f08;
+  --sidebar-accent: #f5f1e8;
+  --sidebar-accent-foreground: #1a0f08;
+  --sidebar-border: #d4af37;
+  --sidebar-ring: #d4af37;
+  --font-sans: "Cinzel", serif;
+  --font-serif: "Cinzel Decorative", serif;
+  --font-mono: "Courier New", monospace;
+  --ember: #ff6b35;
+  --ember-glow: #ff8c42;
+  --parchment: #faf8f2;
+  --parchment-dark: #f5f1e8;
+  --shadow-deep: #00000030;
+  --rune-glow: #ffd700;
+}
+
+.light {
+  /* Updated light theme with more vibrant colors */
+  --background: #faf8f2;
+  --foreground: #1a0f08;
+  --card: #ffffff;
+  --card-foreground: #1a0f08;
+  --popover: #ffffff;
+  --popover-foreground: #1a0f08;
+  --primary: #d4af37;
+  --primary-foreground: #1a0f08;
+  --secondary: #f5f1e8;
+  --secondary-foreground: #1a0f08;
+  --muted: #f0ebe0;
+  --muted-foreground: #8b6914;
+  --accent: #daa520;
+  --accent-foreground: #1a0f08;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: #d4af37;
+  --input: #ffffff;
+  --ring: #d4af37;
+  --chart-1: #d4af37;
+  --chart-2: #b8860b;
+  --chart-3: #daa520;
+  --chart-4: #ffd700;
+  --chart-5: #ffb347;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #1a0f08;
+  --sidebar-primary: #d4af37;
+  --sidebar-primary-foreground: #1a0f08;
+  --sidebar-accent: #f5f1e8;
+  --sidebar-accent-foreground: #1a0f08;
+  --sidebar-border: #d4af37;
+  --sidebar-ring: #d4af37;
+  --ember: #ff6b35;
+  --ember-glow: #ff8c42;
+  --parchment: #faf8f2;
+  --parchment-dark: #f5f1e8;
+  --shadow-deep: #00000030;
+  --rune-glow: #ffd700;
+}
+
+.dark {
+  /* Updated dark theme with richer, more vibrant colors */
+  --background: #0d0a0f;
+  --foreground: #e6d7ff;
+  --card: #1a1625;
+  --card-foreground: #e6d7ff;
+  --popover: #1a1625;
+  --popover-foreground: #e6d7ff;
+  --primary: #9d4edd;
+  --primary-foreground: #ffffff;
+  --secondary: #2d1b3d;
+  --secondary-foreground: #e6d7ff;
+  --muted: #2d1b3d;
+  --muted-foreground: #b794f6;
+  --accent: #7c3aed;
+  --accent-foreground: #ffffff;
+  --destructive: #e53e3e;
+  --destructive-foreground: #ffffff;
+  --border: #7c3aed;
+  --input: #2d1b3d;
+  --ring: #9d4edd;
+  --chart-1: #9d4edd;
+  --chart-2: #7c3aed;
+  --chart-3: #8b5cf6;
+  --chart-4: #a78bfa;
+  --chart-5: #c4b5fd;
+  --sidebar: #1a1625;
+  --sidebar-foreground: #e6d7ff;
+  --sidebar-primary: #9d4edd;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #2d1b3d;
+  --sidebar-accent-foreground: #e6d7ff;
+  --sidebar-border: #7c3aed;
+  --sidebar-ring: #9d4edd;
+  --ember: #ff6b6b;
+  --ember-glow: #ff8787;
+  --parchment: #2d1b3d;
+  --parchment-dark: #1a1625;
+  --shadow-deep: #000000;
+  --rune-glow: #ffd700;
+}
+
+@theme inline {
+  /* optional: --font-sans, --font-serif, --font-mono if they are applied in the layout.tsx */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-feature-settings: "rlig" 1, "calt" 1;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Floating ember particles animation */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(1px 1px at 20px 30px, var(--ember), transparent),
+    radial-gradient(1px 1px at 40px 70px, var(--ember-glow), transparent),
+    radial-gradient(1px 1px at 90px 40px, var(--ember), transparent),
+    radial-gradient(1px 1px at 130px 80px, var(--ember-glow), transparent),
+    radial-gradient(1px 1px at 160px 30px, var(--ember), transparent);
+  background-repeat: repeat;
+  background-size: 200px 100px;
+  animation: float 20s linear infinite;
+  pointer-events: none;
+  opacity: 0.3;
+  z-index: -1;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(100vh) translateX(0px);
+  }
+  100% {
+    transform: translateY(-100px) translateX(100px);
+  }
+}
+
+/* Updated parchment texture with new color scheme */
+.parchment {
+  background: linear-gradient(45deg, var(--parchment) 0%, var(--parchment-dark) 100%);
+  color: var(--foreground);
+  position: relative;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px var(--shadow-deep), inset 0 1px 0 var(--primary);
+}
+
+.parchment::before {
+  content: "";
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, var(--primary), var(--accent));
+  border-radius: 10px;
+  z-index: -1;
+}
+
+/* Torn edges effect */
+.torn-edges {
+  position: relative;
+}
+
+.torn-edges::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='m0 20c5-3 10-8 15-8s10 5 15 8 10-3 15-8 10 5 15 8 10-3 15-8 10 5 15 8v-20h-100z' fill='%23f4e4bc'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-position: bottom;
+  pointer-events: none;
+}
+
+/* Glowing ember effect for flame passes */
+.ember-glow {
+  color: var(--ember);
+  text-shadow: 0 0 10px var(--ember-glow);
+  animation: pulse-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-glow {
+  from {
+    text-shadow: 0 0 10px var(--ember-glow);
+  }
+  to {
+    text-shadow: 0 0 20px var(--ember-glow), 0 0 30px var(--ember);
+  }
+}
+
+/* Updated wax seal with new color scheme */
+.wax-seal {
+  width: 40px;
+  height: 40px;
+  background: radial-gradient(circle, var(--destructive), #8b0000);
+  border-radius: 50%;
+  position: relative;
+  box-shadow: 0 2px 4px var(--shadow-deep);
+}
+
+.wax-seal::before {
+  content: "✉";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--primary-foreground);
+  font-size: 16px;
+  text-shadow: 0 1px 2px var(--shadow-deep);
+}
+
+/* Burned scroll divider */
+.burned-scroll {
+  background: linear-gradient(90deg, transparent 0%, var(--accent) 20%, var(--accent) 80%, transparent 100%);
+  height: 2px;
+  position: relative;
+  margin: 2rem 0;
+}
+
+.burned-scroll::before,
+.burned-scroll::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  width: 10px;
+  height: 10px;
+  background: var(--accent);
+  border-radius: 50%;
+}
+
+.burned-scroll::before {
+  left: 20%;
+}
+.burned-scroll::after {
+  right: 20%;
+}
+
+/* Gothic text styling */
+.gothic-title {
+  font-family: var(--font-serif);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.handwritten {
+  font-family: "Brush Script MT", cursive;
+  font-style: italic;
+}
+
+/* Rune glow effect */
+.rune-glow {
+  color: var(--rune-glow);
+  text-shadow: 0 0 15px var(--rune-glow);
+  animation: rune-pulse 3s ease-in-out infinite;
+}
+
+@keyframes rune-pulse {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+}
