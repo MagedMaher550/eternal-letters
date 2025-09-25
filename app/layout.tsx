@@ -23,7 +23,9 @@ export const metadata: Metadata = {
   description: "A mystical space for exchanging ancient scrolls between souls",
   generator: "MSS",
   icons: {
-    icon: "/favicon.ico", 
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico", // recommended for modern browsers
+    apple: "/favicon.ico", // optional, for iOS devices
   },
 };
 
