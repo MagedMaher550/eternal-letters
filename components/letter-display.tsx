@@ -34,8 +34,16 @@ export function LetterDisplay({
 }: LetterDisplayProps) {
   const [showModal, setShowModal] = useState<boolean>(false);
 
-  const formatDate = (timestamp: string) => {
-    return new Date(timestamp).toLocaleDateString("en-US", {
+  const getFormattedDate = (timestamp: any): string => {
+    // Normalize Firestore Timestamp or plain string/Date
+    const date =
+      typeof timestamp === "object" && timestamp && "toDate" in timestamp
+        ? timestamp.toDate()
+        : new Date(timestamp);
+
+    if (isNaN(date.getTime())) return "Invalid date";
+
+    return date.toLocaleDateString("en-US", {
       weekday: "long",
       year: "numeric",
       month: "long",
@@ -73,7 +81,7 @@ export function LetterDisplay({
               {capitalizeSenderName(letter.sender)}
             </h3>
             <p className="text-xs sm:text-sm text-muted-foreground/80">
-              {formatDate("" + letter.timestamp)}
+              {getFormattedDate(letter.timestamp)}
             </p>
           </div>
           {canSelect && (
