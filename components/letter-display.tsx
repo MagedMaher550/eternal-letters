@@ -8,7 +8,7 @@ import {
   deselectLetterFirebase,
   selectLetterFirebase,
 } from "@/lib/firebaseUpdate";
-import { FlameIndicator } from "./FlameIndicator";
+import FlameIndicator from "./flameIndicator";
 
 interface LetterDisplayProps {
   letter: Letter;

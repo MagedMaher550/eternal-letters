@@ -1,24 +1,9 @@
 // /lib/profileMetrics.ts
 import { ref, get } from "firebase/database";
 import { database } from "./firebase";
+import { Letter } from "./types";
 
-/**
- * Represents a single letter written by a user.
- */
-export interface Letter {
-    /** Unique identifier for the letter */
-    id: string;
-    /** Username of the letter's sender */
-    sender: string;
-    /** Timestamp when the letter was created (in milliseconds) */
-    timestamp: number;
-    /** Content of the letter */
-    content: string;
-    /** Week number in which the letter was written */
-    week: number;
-    /** Whether this letter was selected by the user */
-    isSelected: boolean;
-}
+
 
 /**
  * Represents aggregated metrics for a user's profile.
@@ -76,10 +61,13 @@ export const fetchProfileMetrics = async (username: string): Promise<ProfileMetr
         const snapshot = await get(ref(database, "letters"));
         const data = snapshot.val() || {};
 
-        // Flatten letters for this specific user
+
+        // Flatten *all* letters
         const letters: Letter[] = [];
-        Object.entries(data).forEach(([dateKey, usersObj]: any) => {
-            if (usersObj[username]) letters.push(usersObj[username]);
+        Object.values(data).forEach((usersObj: any) => {
+            Object.values(usersObj).forEach((letter: any) => {
+                if (letter) letters.push(letter);
+            });
         });
 
         // Return default metrics if no letters exist
@@ -101,6 +89,7 @@ export const fetchProfileMetrics = async (username: string): Promise<ProfileMetr
             };
         }
 
+
         // Sort letters chronologically
         const sortedLetters = letters.sort((a, b) => a.timestamp - b.timestamp);
 
@@ -116,20 +105,54 @@ export const fetchProfileMetrics = async (username: string): Promise<ProfileMetr
         const daysActive = Math.floor((Date.now() - firstLetter.timestamp) / (1000 * 60 * 60 * 24)) + 1;
 
         // Calculate streaks
-        const dates = sortedLetters.map(l => new Date(l.timestamp).setHours(0, 0, 0, 0));
-        let longestStreak = 1;
-        let tempStreak = 1;
+        // user-specific letters (sorted ascending)
+        const userLetters = sortedLetters
+            .filter((l) => l.sender?.toLowerCase() === username.toLowerCase())
+            .sort((a, b) => a.timestamp - b.timestamp);
 
-        for (let i = 1; i < dates.length; i++) {
-            const diffDays = (dates[i] - dates[i - 1]) / (1000 * 60 * 60 * 24);
-            if (diffDays === 1) tempStreak++;
-            else tempStreak = 1;
-            longestStreak = Math.max(longestStreak, tempStreak);
+        // extract unique day timestamps (midnight) in ascending order
+        const days = Array.from(
+            new Set(userLetters.map((l) => new Date(l.timestamp).setHours(0, 0, 0, 0)))
+        ).sort((a, b) => a - b);
+
+        let longestStreak = 0;
+        let currentStreak = 0;
+
+        if (days.length > 0) {
+            // compute longest streak
+            longestStreak = 1;
+            let tempStreak = 1;
+            for (let i = 1; i < days.length; i++) {
+                const diffDays = Math.round((days[i] - days[i - 1]) / (1000 * 60 * 60 * 24));
+                if (diffDays === 1) {
+                    tempStreak++;
+                } else {
+                    tempStreak = 1;
+                }
+                if (tempStreak > longestStreak) longestStreak = tempStreak;
+            }
+
+            // compute current streak (valid if last letter was today or yesterday)
+            const today = new Date().setHours(0, 0, 0, 0);
+            const lastDay = days[days.length - 1];
+            const diffToToday = Math.round((today - lastDay) / (1000 * 60 * 60 * 24));
+
+            if (diffToToday <= 1) {
+                currentStreak = 1;
+                let expected = lastDay - 24 * 60 * 60 * 1000;
+                for (let j = days.length - 2; j >= 0; j--) {
+                    if (days[j] === expected) {
+                        currentStreak++;
+                        expected -= 24 * 60 * 60 * 1000;
+                    } else {
+                        break;
+                    }
+                }
+            } else {
+                currentStreak = 0;
+            }
         }
 
-        const lastDate = dates[dates.length - 1];
-        const diffToday = (new Date().setHours(0, 0, 0, 0) - lastDate) / (1000 * 60 * 60 * 24);
-        const currentStreak = diffToday <= 1 ? tempStreak : 0;
 
         // Calculate week-related metrics
         const uniqueWeeks = Array.from(new Set(sortedLetters.map(l => l.week)));
@@ -141,8 +164,9 @@ export const fetchProfileMetrics = async (username: string): Promise<ProfileMetr
         const lettersThisWeek = sortedLetters.filter(l => l.week === currentWeek).length;
         const weeklyProgress = Math.min((lettersThisWeek / 7) * 100, 100);
 
+
         // Selections made
-        const selectionsMade = sortedLetters.filter(l => l.isSelected).length;
+        const selectionsMade = sortedLetters.filter(l => username === 'maged' ? l.isSelectedByMaged : l.isSelectedByAlyana).length;
 
         // Flame passes (placeholders)
         const flamePassesEarned = 0;

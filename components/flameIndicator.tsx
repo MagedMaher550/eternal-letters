@@ -6,7 +6,7 @@ interface FlameIndicatorProps {
   isFlamePassSelection?: boolean;
 }
 
-export function FlameIndicator({
+export default function FlameIndicator({
   isSelectedByMaged,
   isSelectedByAlyana,
   isFlamePassSelection = false,
