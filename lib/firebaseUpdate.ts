@@ -7,19 +7,37 @@ const getDatePart = (letterId: string) => letterId.split("-").slice(1).join("-")
 export const selectLetterFirebase = async (
     letterId: string,
     sender: string,
+    currentUser: string,
     week: number
 ) => {
+
+    console.log(letterId)
+
+    console.log(sender)
+
+    console.log(week)
+
+
+    const updatedObject = currentUser === 'maged' ? { isSelectedByMaged: true } : { isSelectedByAlyana: true }
     const datePart = getDatePart(letterId);
     const letterRef = ref(database, `letters/${datePart}/${sender}`);
-    await update(letterRef, { isSelected: true });
+
+
+    console.log(`letters/${datePart}/${sender}`)
+
+
+    await update(letterRef, updatedObject);
 };
 
 export const deselectLetterFirebase = async (
     letterId: string,
     sender: string,
-    week: number
+    currentUser: string,
+    week: number,
 ) => {
+
+    const updatedObject = currentUser === 'maged' ? { isSelectedByMaged: false } : { isSelectedByAlyana: false }
     const datePart = getDatePart(letterId);
     const letterRef = ref(database, `letters/${datePart}/${sender}`);
-    await update(letterRef, { isSelected: false });
+    await update(letterRef, updatedObject);
 };

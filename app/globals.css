@@ -203,7 +203,11 @@ body::before {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: radial-gradient(1px 1px at 20px 30px, var(--ember), transparent),
+  background-image: radial-gradient(
+      1px 1px at 20px 30px,
+      var(--ember),
+      transparent
+    ),
     radial-gradient(1px 1px at 40px 70px, var(--ember-glow), transparent),
     radial-gradient(1px 1px at 90px 40px, var(--ember), transparent),
     radial-gradient(1px 1px at 130px 80px, var(--ember-glow), transparent),
@@ -227,7 +231,11 @@ body::before {
 
 /* Updated parchment texture with new color scheme */
 .parchment {
-  background: linear-gradient(45deg, var(--parchment) 0%, var(--parchment-dark) 100%);
+  background: linear-gradient(
+    45deg,
+    var(--parchment) 0%,
+    var(--parchment-dark) 100%
+  );
   color: var(--foreground);
   position: relative;
   border-radius: 8px;
@@ -303,7 +311,13 @@ body::before {
 
 /* Burned scroll divider */
 .burned-scroll {
-  background: linear-gradient(90deg, transparent 0%, var(--accent) 20%, var(--accent) 80%, transparent 100%);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--accent) 20%,
+    var(--accent) 80%,
+    transparent 100%
+  );
   height: 2px;
   position: relative;
   margin: 2rem 0;
@@ -355,4 +369,9 @@ body::before {
   50% {
     opacity: 1;
   }
+}
+
+.purple-glow {
+  color: #a855f7; /* Tailwind purple-500 */
+  text-shadow: 0 0 6px #a855f7, 0 0 12px #9333ea, 0 0 18px #7e22ce;
 }

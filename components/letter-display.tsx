@@ -8,31 +8,40 @@ import {
   deselectLetterFirebase,
   selectLetterFirebase,
 } from "@/lib/firebaseUpdate";
+import { FlameIndicator } from "./FlameIndicator";
 
 interface LetterDisplayProps {
   letter: Letter;
   canSelect?: boolean;
-  isSelected?: boolean;
   onSelect?: (letterId: string) => void;
-  isFlamePassSelection?: boolean;
   currentUser: string;
   isSelectionLocked: boolean;
-  canDeselect: boolean;
   weekNumber: number;
 }
 
 export function LetterDisplay({
   letter,
   canSelect = false,
-  isSelected = false,
   onSelect,
-  isFlamePassSelection = false,
   currentUser,
   isSelectionLocked,
-  canDeselect,
+  // canDeselect,
   weekNumber,
 }: LetterDisplayProps) {
   const [showModal, setShowModal] = useState<boolean>(false);
+
+  const isSelected =
+    currentUser === "maged"
+      ? letter.isSelectedByMaged
+      : letter.isSelectedByAlyana;
+
+  // Only allow deselect if this user is the one who selected
+  const canDeselect = isSelected;
+
+  // Disable select button if:
+  // - user is trying to select a different letter while week is locked
+  // - or trying to deselect another user’s letter (blocked by canDeselect)
+  const disableButton = !canDeselect && !isSelected && isSelectionLocked;
 
   const getFormattedDate = (timestamp: any): string => {
     // Normalize Firestore Timestamp or plain string/Date
@@ -58,11 +67,11 @@ export function LetterDisplay({
 
   const selectLetterHandler = () => {
     if (isSelected) {
-      deselectLetterFirebase(letter.id, currentUser, weekNumber)
+      deselectLetterFirebase(letter.id, letter.sender, currentUser, weekNumber)
         .then(() => onSelect?.(letter.id))
         .catch((err) => console.error(err));
     } else {
-      selectLetterFirebase(letter.id, currentUser, weekNumber)
+      selectLetterFirebase(letter.id, letter.sender, currentUser, weekNumber)
         .then(() => onSelect?.(letter.id))
         .catch((err) => console.error(err));
     }
@@ -73,7 +82,7 @@ export function LetterDisplay({
       <div
         className={`parchment torn-edges p-4 sm:p-6 md:p-8 mx-2 sm:mx-4 md:mx-8 relative transition-all duration-300 ${
           isSelected ? "ring-2 ring-ember shadow-lg shadow-ember/20" : ""
-        } ${isFlamePassSelection ? "bg-ember/5" : ""}`}
+        }`}
       >
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2 sm:gap-3">
           <div className="flex-1">
@@ -87,7 +96,7 @@ export function LetterDisplay({
           {canSelect && (
             <div className="flex-shrink-0 mt-2 sm:mt-0">
               <Button
-                disabled={!canDeselect && !isSelected && isSelectionLocked}
+                disabled={disableButton}
                 onClick={() => setShowModal(true)}
                 variant={isSelected ? "default" : "outline"}
                 size="sm"
@@ -97,7 +106,7 @@ export function LetterDisplay({
                     : "border-accent text-accent hover:bg-accent/10"
                 }`}
               >
-                {isSelected ? "Selected" : "Select"}
+                {isSelected ? "Deselect" : "Select"}
               </Button>
             </div>
           )}
@@ -109,25 +118,18 @@ export function LetterDisplay({
           </p>
         </div>
 
-        {isFlamePassSelection && (
+        {/* {isFlamePassSelection && (
           <div className="mt-4 pt-4 border-t border-accent/30">
             <span className="text-xs text-ember font-medium">
               Flame Pass Selection
             </span>
           </div>
-        )}
+        )} */}
 
-        {isSelected && (
-          <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2">
-            <div
-              className={`text-xl sm:text-2xl ${
-                isFlamePassSelection ? "ember-glow animate-pulse" : "ember-glow"
-              }`}
-            >
-              🔥
-            </div>
-          </div>
-        )}
+        <FlameIndicator
+          isSelectedByAlyana={letter.isSelectedByAlyana}
+          isSelectedByMaged={letter.isSelectedByMaged}
+        />
       </div>
 
       <SelectionConfirmation

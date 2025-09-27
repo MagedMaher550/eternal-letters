@@ -52,18 +52,18 @@ export default function HomePage() {
   const canWriteToday = !loading && !lettersByDate[todayKey]?.[currentUser!];
 
   // -------------------------
-  // Flatten letters for weekly view
+  // Flatten letters for weekly view (newest first)
   // -------------------------
   const lettersArray: Letter[] = Object.values(lettersByDate)
     .flatMap((dayObj) => Object.values(dayObj))
-    .sort((a, b) => a.timestamp - b.timestamp);
+    .sort((a, b) => b.timestamp - a.timestamp); // 👈 changed
 
   // -------------------------
-  // Compute all weeks and current week
+  // Compute all weeks and current week (newest first)
   // -------------------------
   const weeks = [
     ...new Set(lettersArray.map((letter) => letter.week).filter(Boolean)),
-  ].sort((a, b) => a - b);
+  ].sort((a, b) => b - a);
 
   const currentWeek = Math.max(...weeks, 1);
 
@@ -88,8 +88,6 @@ export default function HomePage() {
   // Handle new letter submission
   // -------------------------
   const handleLetterSubmit = async (content: string) => {
-    console.log("ssss");
-
     if (!currentUser) return;
 
     const newLetter: Letter = {
@@ -98,7 +96,8 @@ export default function HomePage() {
       timestamp: Date.now(),
       week: currentWeek,
       id: `${currentUser.toLowerCase()}-${todayKey}`,
-      isSelected: false,
+      isSelectedByAlyana: false,
+      isSelectedByMaged: false,
     };
 
     try {
@@ -166,8 +165,11 @@ export default function HomePage() {
                   completedWeeks[currentUser!]?.has(week) || false;
                 const canSelectLetters = isCurrentWeek || !isCompleted;
 
-                const selectedLetter = weekLetters.find(
-                  (letter) => letter.isSelected
+                const magedSelectedLetter = weekLetters.find(
+                  (letter) => letter.isSelectedByMaged
+                );
+                const alyanaSelectedLetter = weekLetters.find(
+                  (letter) => letter.isSelectedByAlyana
                 );
 
                 return week ? (
@@ -177,7 +179,8 @@ export default function HomePage() {
                     letters={weekLetters}
                     isCurrentWeek={isCurrentWeek}
                     canSelectLetters={canSelectLetters}
-                    selectedLetter={selectedLetter}
+                    magedSelectedLetter={magedSelectedLetter}
+                    alyanaSelectedLetter={alyanaSelectedLetter}
                     onLetterSelect={handleLetterSelect(week)}
                     hasFlamePassSelection={false} // Integrate flame pass logic later
                     canUseFlamePass={false}

@@ -5,15 +5,16 @@ import { LetterDisplay } from "./letter-display";
 import { WeeklyDivider } from "./weekly-divider";
 import { Button } from "@/components/ui/button";
 import { Letter } from "@/lib/types";
+import { getCurrentWeekNumber } from "@/lib/utils";
 
 interface WeeklySectionProps {
   weekNumber: number;
   letters: Letter[];
   isCurrentWeek?: boolean;
   canSelectLetters?: boolean;
-  selectedLetter?: Letter | undefined;
+  alyanaSelectedLetter?: Letter | undefined;
+  magedSelectedLetter?: Letter | undefined;
   onLetterSelect?: (letterId: string) => void;
-  onWeekComplete?: (weekNumber: number, selectedLetter?: string) => void;
   hasFlamePassSelection?: boolean;
   canUseFlamePass?: boolean;
   onUseFlamePass?: () => void;
@@ -25,9 +26,9 @@ export function WeeklySection({
   letters,
   isCurrentWeek = false,
   canSelectLetters = false,
-  selectedLetter,
+  magedSelectedLetter,
+  alyanaSelectedLetter,
   onLetterSelect,
-  onWeekComplete,
   hasFlamePassSelection = false,
   canUseFlamePass = false,
   onUseFlamePass,
@@ -35,9 +36,13 @@ export function WeeklySection({
 }: WeeklySectionProps) {
   const [isExpanded, setIsExpanded] = useState(isCurrentWeek);
 
-  const isWeekLocked = letters.some(
-    (l) => l.week === weekNumber && l.isSelected
-  );
+  const currentWeekNumber = getCurrentWeekNumber();
+
+  const isWeekLocked =
+    weekNumber < currentWeekNumber || // past weeks are locked
+    letters.some((l) =>  // user can only select one letter a week
+      currentUser === "maged" ? l.isSelectedByMaged : l.isSelectedByAlyana
+    );
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -45,7 +50,7 @@ export function WeeklySection({
         <WeeklyDivider
           weekNumber={weekNumber}
           isComplete={!isCurrentWeek}
-          hasSelectedLetter={!!selectedLetter}
+          hasSelectedLetter={!!alyanaSelectedLetter || !!magedSelectedLetter}
           hasFlamePassSelection={hasFlamePassSelection}
         />
 
@@ -77,27 +82,14 @@ export function WeeklySection({
           {/* Letters */}
           <div className="space-y-4 sm:space-y-6">
             {letters.map((letter) => {
-              const canDeselect = (letter: Letter) => {
-                const letterWeek = letter.week;
-                const currentWeek = weekNumber; // implement a function to get week number
-                return (
-                  selectedLetter?.id === letter.id && currentWeek === letterWeek
-                );
-              };
-
               return (
                 <LetterDisplay
                   key={letter.id}
                   letter={letter}
                   canSelect={canSelectLetters}
-                  isSelected={letter.isSelected}
                   onSelect={onLetterSelect}
-                  isFlamePassSelection={
-                    hasFlamePassSelection && selectedLetter?.id === letter.id
-                  }
                   currentUser={currentUser}
                   isSelectionLocked={isWeekLocked}
-                  canDeselect={canDeselect(letter)}
                   weekNumber={weekNumber}
                 />
               );
@@ -118,11 +110,15 @@ export function WeeklySection({
 
               {canSelectLetters && (
                 <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
-                  {selectedLetter ? (
+                  {magedSelectedLetter || alyanaSelectedLetter ? (
                     <span className="text-xs sm:text-sm text-ember font-medium">
                       {hasFlamePassSelection
                         ? "Flame Pass selection"
-                        : "Letter selected for discussion"}
+                        : `Letter${
+                            magedSelectedLetter && alyanaSelectedLetter
+                              ? "s"
+                              : ""
+                          } selected for discussion`}
                     </span>
                   ) : (
                     <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">

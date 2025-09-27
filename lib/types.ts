@@ -4,7 +4,8 @@ export type Letter = {
     content: string;
     timestamp: number;
     sender: "maged" | "alyana";
-    isSelected: boolean
+    isSelectedByMaged: boolean
+    isSelectedByAlyana: boolean
 };
 
 export interface ProfileMetrics {
