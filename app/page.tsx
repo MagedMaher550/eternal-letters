@@ -10,6 +10,7 @@ import { subscribeLetters } from "@/lib/firebaseListeners";
 import { writeLetter } from "@/lib/firebaseWrite";
 import { Letter } from "@/lib/types";
 import BonfireLoader from "@/components/glowingFlameLoader";
+import { normalizeDate } from "@/lib/utils";
 
 /**
  * HomePage component
@@ -52,7 +53,7 @@ export default function HomePage() {
   const userKey = currentUser?.toLowerCase() as "maged" | "alyana";
 
   // Compute "today" in the user's local time (browser time)
-  const todayKey = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
+  const todayKey = normalizeDate(new Date()).toLocaleDateString("en-CA"); // YYYY-MM-DD
 
   // Determine if the user can write today
   const canWriteToday = !loading && !lettersByDate[todayKey]?.[userKey];

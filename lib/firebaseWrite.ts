@@ -1,6 +1,7 @@
 import { ref, set } from "firebase/database";
 import { database } from "./firebase";
 import { Letter } from "./types";
+import { normalizeDate } from "./utils";
 
 // Function to compute the current week number
 const getWeekNumber = (date: Date) => {
@@ -13,11 +14,12 @@ export const writeLetter = async (
     letter: Letter
 ) => {
 
-    const today = new Date();
+    const today = normalizeDate(new Date());
     const dateKey = today.toISOString().split("T")[0]; // YYYY-MM-DD
     const weekNumber = getWeekNumber(today);
 
-    const { content, sender: userId, isSelected, timestamp } = letter
+    const { content, sender: userId, isSelectedByAlyana, isSelectedByMaged, timestamp } = letter
+
 
     const newLetter: Letter = {
         week: weekNumber,
@@ -25,7 +27,8 @@ export const writeLetter = async (
         timestamp,
         sender: userId,
         id: `${userId}-${dateKey}`, // optional unique ID
-        isSelected
+        isSelectedByAlyana,
+        isSelectedByMaged
     };
 
     const letterRef = ref(database, `letters/${dateKey}/${userId}`);

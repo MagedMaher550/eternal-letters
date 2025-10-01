@@ -7,6 +7,7 @@ import { writeLetter } from "@/lib/firebaseWrite";
 import { ref, get } from "firebase/database";
 import { database } from "@/lib/firebase";
 import { Letter } from "@/lib/types";
+import { normalizeDate } from "@/lib/utils";
 
 interface LetterComposerProps {
   currentUser: "maged" | "alyana";
@@ -32,11 +33,12 @@ export function LetterComposer({
 
     setIsSubmitting(true);
 
-    const todayKey = new Date().toISOString().split("T")[0];
+    const todayKey = normalizeDate(new Date()).toISOString().split("T")[0];
     const letterRef = ref(database, `letters/${todayKey}/${currentUser}`);
 
     try {
       const snapshot = await get(letterRef);
+
       if (snapshot.exists()) {
         alert(
           "You have already written your letter for today. Return tomorrow to continue your correspondence."
@@ -50,9 +52,12 @@ export function LetterComposer({
         sender: currentUser.toLowerCase() as "maged" | "alyana",
         timestamp: Date.now(),
         id: `${currentUser.toLowerCase()}-${todayKey}`,
-        isSelected: false,
+        isSelectedByAlyana: false,
+        isSelectedByMaged: false,
         week: 0,
       };
+
+      console.log(newLetter);
 
       // Write the letter to Firebase
       await writeLetter(newLetter);
