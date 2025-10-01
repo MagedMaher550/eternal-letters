@@ -48,8 +48,14 @@ export default function HomePage() {
   // -------------------------
   // Determine if current user can write today
   // -------------------------
-  const todayKey = new Date().toISOString().split("T")[0];
-  const canWriteToday = !loading && !lettersByDate[todayKey]?.[currentUser!];
+  // Normalize the user key
+  const userKey = currentUser?.toLowerCase() as "maged" | "alyana";
+
+  // Compute "today" in the user's local time (browser time)
+  const todayKey = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
+
+  // Determine if the user can write today
+  const canWriteToday = !loading && !lettersByDate[todayKey]?.[userKey];
 
   // -------------------------
   // Flatten letters for weekly view (newest first)
