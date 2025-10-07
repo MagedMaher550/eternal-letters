@@ -1,23 +1,17 @@
 import { NextResponse } from "next/server";
-import { database as db } from "@/lib/firebase";
-import { collection, addDoc, Timestamp } from "firebase/firestore";
+import { database } from "@/lib/firebase";
+import { ref, push, serverTimestamp } from "firebase/database";
 
 export async function GET() {
     try {
-        console.log("Step 1: Entered API route");
-
-        if (!db) throw new Error("Firestore instance not initialized");
-        console.log("Step 2: Firestore connected");
-
-        const docRef = await addDoc(collection(db, "weeklyTasks"), {
-            createdAt: Timestamp.now(),
+        const weeklyTasksRef = ref(database, "flamePasses");
+        const newTaskRef = await push(weeklyTasksRef, {
+            createdAt: serverTimestamp(),
             status: "created - test",
         });
 
-        console.log("Step 3: Document added", docRef.id);
-
         return NextResponse.json(
-            { message: "Weekly task executed successfully", id: docRef.id },
+            { message: "Weekly task executed successfully", id: newTaskRef.key },
             { status: 200 }
         );
     } catch (error: any) {
