@@ -1,39 +1,31 @@
-import { ref, set } from "firebase/database";
-import { database } from "./firebase";
-import { Letter } from "./types";
-import { normalizeDate } from "./utils";
+import { NextResponse } from "next/server";
+import { database as db } from "./firebase";
+import { collection, addDoc, Timestamp } from "firebase/firestore";
 
-// Function to compute the current week number
-const getWeekNumber = (date: Date) => {
-    const startOfYear = new Date(date.getFullYear(), 0, 1);
-    const diff = date.getTime() - startOfYear.getTime();
-    return Math.ceil((diff / (1000 * 60 * 60 * 24) + startOfYear.getDay() + 1) / 7);
-};
+export async function POST() {
+    try {
+        const docRef = await addDoc(collection(db, "weeklyTasks"), {
+            createdAt: Timestamp.now(),
+            status: "created",
+        });
 
-export const writeLetter = async (
-    letter: Letter
-) => {
+        return NextResponse.json(
+            { message: "Weekly task executed successfully", id: docRef.id },
+            { status: 200 }
+        );
+    } catch (error) {
+        console.error("Error executing weekly task:", error);
+        return NextResponse.json(
+            { error: "Failed to execute weekly task" },
+            { status: 500 }
+        );
+    }
+}
 
-    const today = normalizeDate(new Date());
-    const dateKey = today.toISOString().split("T")[0]; // YYYY-MM-DD
-    const weekNumber = getWeekNumber(today);
-
-    const { content, sender: userId, isSelectedByAlyana, isSelectedByMaged, timestamp } = letter
-
-
-    const newLetter: Letter = {
-        week: weekNumber,
-        content,
-        timestamp,
-        sender: userId,
-        id: `${userId}-${dateKey}`, // optional unique ID
-        isSelectedByAlyana,
-        isSelectedByMaged
-    };
-
-    const letterRef = ref(database, `letters/${dateKey}/${userId}`);
-    await set(letterRef, newLetter);
-};
-
-
-
+// Optional safety net if someone sends GET manually
+export async function GET() {
+    return NextResponse.json(
+        { message: "Method Not Allowed. Use POST instead." },
+        { status: 405 }
+    );
+}

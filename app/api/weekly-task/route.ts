@@ -1,15 +1,31 @@
 import { NextResponse } from "next/server";
+import { database as db } from "../../../lib/firebase";
+import { collection, addDoc, Timestamp } from "firebase/firestore";
 
-const SECRET = process.env.WEEKLY_JOB_TOKEN;
+export async function POST() {
+    try {
+        const docRef = await addDoc(collection(db, "weeklyTasks"), {
+            createdAt: Timestamp.now(),
+            status: "created",
+        });
 
-export async function GET(request: Request) {
-    const url = new URL(request.url);
-    const token = url.searchParams.get("token");
-
-    if (SECRET && token !== SECRET) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        return NextResponse.json(
+            { message: "Weekly task executed successfully", id: docRef.id },
+            { status: 200 }
+        );
+    } catch (error) {
+        console.error("Error executing weekly task:", error);
+        return NextResponse.json(
+            { error: "Failed to execute weekly task" },
+            { status: 500 }
+        );
     }
+}
 
-    console.log("weekly task executed securely");
-    return NextResponse.json({ status: "ok", executedAt: new Date().toISOString() });
+// Optional safety net if someone sends GET manually
+export async function GET() {
+    return NextResponse.json(
+        { message: "Method Not Allowed. Use POST instead." },
+        { status: 405 }
+    );
 }
