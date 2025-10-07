@@ -46,6 +46,8 @@ export default function HomePage() {
     });
   }, []);
 
+  console.log(lettersByDate)
+
   // -------------------------
   // Determine if current user can write today
   // -------------------------
