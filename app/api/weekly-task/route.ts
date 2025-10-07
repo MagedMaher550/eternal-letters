@@ -1,16 +1,22 @@
 import { NextResponse } from "next/server";
-import { database as db } from "../../../lib/firebase";
+import { db } from "@/lib/firebase";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
 
-export async function POST() {
-    try {
-        const docRef = await addDoc(collection(db, "weeklyTasks"), {
-            createdAt: Timestamp.now(),
-            status: "created",
-        });
+// Core function to create a new weekly task
+async function createWeeklyTask() {
+    const docRef = await addDoc(collection(db, "weeklyTasks"), {
+        createdAt: Timestamp.now(),
+        status: "created - test",
+    });
+    return docRef.id;
+}
 
+// Allow GET (for cron job trigger)
+export async function GET() {
+    try {
+        const id = await createWeeklyTask();
         return NextResponse.json(
-            { message: "Weekly task executed successfully", id: docRef.id },
+            { message: "Weekly task executed successfully", id },
             { status: 200 }
         );
     } catch (error) {
@@ -22,10 +28,5 @@ export async function POST() {
     }
 }
 
-// Optional safety net if someone sends GET manually
-export async function GET() {
-    return NextResponse.json(
-        { message: "Method Not Allowed. Use POST instead." },
-        { status: 405 }
-    );
-}
+// Allow POST (same logic)
+export const POST = GET;
