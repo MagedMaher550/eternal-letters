@@ -34,3 +34,6 @@ export const writeLetter = async (
     const letterRef = ref(database, `letters/${dateKey}/${userId}`);
     await set(letterRef, newLetter);
 };
+
+
+

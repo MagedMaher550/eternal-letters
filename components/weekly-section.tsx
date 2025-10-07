@@ -40,8 +40,11 @@ export function WeeklySection({
 
   const isWeekLocked =
     weekNumber < currentWeekNumber || // past weeks are locked
-    letters.some((l) =>  // user can only select one letter a week
-      currentUser === "maged" ? l.isSelectedByMaged : l.isSelectedByAlyana
+    letters.some(
+      (
+        l // user can only select one letter a week
+      ) =>
+        currentUser === "maged" ? l.isSelectedByMaged : l.isSelectedByAlyana
     );
 
   return (
