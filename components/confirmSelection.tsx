@@ -7,6 +7,7 @@ interface SelectionConfirmationProps {
   selectedLetter: Letter | null;
   setShowModal: (value: boolean) => void;
   isSelected: boolean;
+  isFlamePassUsage: boolean;
   confirmAction: () => void;
 }
 
@@ -15,6 +16,7 @@ export default function SelectionConfirmation({
   selectedLetter,
   setShowModal,
   isSelected,
+  isFlamePassUsage,
   confirmAction,
 }: SelectionConfirmationProps) {
   if (!showModal || !selectedLetter) return <></>;
@@ -29,12 +31,27 @@ export default function SelectionConfirmation({
 
         <div className="p-6 text-center">
           <h2 className="text-2xl font-black text-amber-800 mb-3 tracking-widest">
-            Confirm {isSelected ? "Deselection" : "Selection"}
+            Confirm{" "}
+            {!isFlamePassUsage
+              ? isSelected
+                ? "Deselection"
+                : "Selection"
+              : "flame pass usage"}
           </h2>
           <p className="mb-6 text-sm text-gray-800 italic">
-            {`Do you wish to ${
-              !isSelected ? "claim" : "Abandon"
-            } this letter for the week?`}
+            {!isFlamePassUsage ? (
+              <>
+                Do you wish to {!isSelected ? "claim" : "abandon"}
+                this letter for the week?
+              </>
+            ) : (
+              <>
+                Do you wish to use a <strong>Flame Pass</strong> to claim this
+                letter? <br />
+                This action is <strong>irreversible</strong>. <br />
+                Once you use your flame pass, it'll be gone forever
+              </>
+            )}
           </p>
 
           <div className="flex justify-center gap-4">

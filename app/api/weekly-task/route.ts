@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { database } from "@/lib/firebase";
 import { ref, get, push, serverTimestamp } from "firebase/database";
+import { getCurrentWeekNumber } from "@/lib/utils";
 
 export async function GET() {
     try {
@@ -54,7 +55,8 @@ export async function GET() {
         const flamePassRef = ref(database, "flamePasses");
         const now = new Date();
         const expiresAt = new Date(now);
-        expiresAt.setDate(now.getDate() + 14); // 2 weeks after creation
+        expiresAt.setDate(now.getDate() + 7); // 1 week after creation
+        const weekNumber = getCurrentWeekNumber()
 
         if (!magedHasSelected) {
             await push(flamePassRef, {
@@ -62,6 +64,8 @@ export async function GET() {
                 expiresAt: expiresAt.toISOString(),
                 for: "maged",
                 reason: "No selection in past 7 days",
+                used: false,
+                weekNumber,
             });
         }
 
@@ -71,6 +75,8 @@ export async function GET() {
                 expiresAt: expiresAt.toISOString(),
                 for: "alyana",
                 reason: "No selection in past 7 days",
+                used: false,
+                weekNumber,
             });
         }
 

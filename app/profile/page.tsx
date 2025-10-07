@@ -10,31 +10,6 @@ import { fetchProfileMetrics } from "@/lib/profileMetrics";
 import { useAuth } from "@/contexts/auth-context";
 import GlowingFlameLoader from "@/components/glowingFlameLoader";
 
-// Dummy data
-const dummyFlamePasses = [
-  {
-    id: "fp1",
-    issuedDate: "2024-01-21T00:00:00Z",
-    expiryDate: "2024-01-28T23:59:59Z",
-    isUsed: false,
-    weekEarned: 1,
-  },
-  {
-    id: "fp2",
-    issuedDate: "2024-01-14T00:00:00Z",
-    expiryDate: "2024-01-21T23:59:59Z",
-    isUsed: true,
-    weekEarned: 0,
-  },
-  {
-    id: "fp3",
-    issuedDate: "2024-01-07T00:00:00Z",
-    expiryDate: "2024-01-14T23:59:59Z",
-    isUsed: false,
-    weekEarned: -1,
-  },
-];
-
 // const dummyUserStats = {
 //   totalLetters: 12,
 //   currentStreak: 5,
@@ -61,12 +36,11 @@ export default function ProfilePage() {
       .finally(() => setLoading(false));
   }, [currentUser]);
 
+  console.log(metrics)
+
   return (
     <div className="min-h-screen bg-background">
-      <Navigation
-        currentUser={currentUser || "Maged"}
-        flamePasses={dummyFlamePasses}
-      />
+      <Navigation />
 
       <main className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="text-center mb-12">
@@ -84,7 +58,7 @@ export default function ProfilePage() {
             <div className="burned-scroll"></div>
             <UserStats stats={metrics} />
             <div className="burned-scroll"></div>
-            <FlamePassHistory flamePasses={dummyFlamePasses} />
+            <FlamePassHistory flamePasses={metrics?.userFlames || []} />
           </div>
         ) : (
           <GlowingFlameLoader />

@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Letter } from "@/lib/types";
+import { FlamePass, Letter } from "@/lib/types";
 import { useState } from "react";
 import SelectionConfirmation from "./confirmSelection";
 import {
@@ -9,6 +9,7 @@ import {
   selectLetterFirebase,
 } from "@/lib/firebaseUpdate";
 import FlameIndicator from "./flameIndicator";
+import { useFlamePassFirebase } from "@/lib/firebaseFlamePasses";
 
 interface LetterDisplayProps {
   letter: Letter;
@@ -16,6 +17,7 @@ interface LetterDisplayProps {
   onSelect?: (letterId: string) => void;
   currentUser: string;
   isSelectionLocked: boolean;
+  weeklyFlamePass: FlamePass | undefined;
   weekNumber: number;
 }
 
@@ -25,10 +27,11 @@ export function LetterDisplay({
   onSelect,
   currentUser,
   isSelectionLocked,
-  // canDeselect,
+  weeklyFlamePass,
   weekNumber,
 }: LetterDisplayProps) {
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [isFlamePassUsage, setIsFlamePassUsage] = useState<boolean>(false);
 
   const isSelected =
     currentUser === "maged"
@@ -77,6 +80,27 @@ export function LetterDisplay({
     }
   };
 
+  const flamePassUsageHandler = async () => {
+    try {
+      // Select the letter
+      await selectLetterFirebase(
+        letter.id,
+        letter.sender,
+        currentUser,
+        weekNumber
+      );
+      onSelect?.(letter.id);
+
+      // Mark the flame pass as used if it exists
+      if (weeklyFlamePass) {
+        await useFlamePassFirebase(weeklyFlamePass.id);
+        console.log(`Flame pass ${weeklyFlamePass.id} used successfully`);
+      }
+    } catch (err) {
+      console.error("Error during flame pass usage:", err);
+    }
+  };
+
   return (
     <div className="relative">
       <div
@@ -95,19 +119,43 @@ export function LetterDisplay({
           </div>
           {canSelect && (
             <div className="flex-shrink-0 mt-2 sm:mt-0">
-              <Button
-                disabled={disableButton}
-                onClick={() => setShowModal(true)}
-                variant={isSelected ? "default" : "outline"}
-                size="sm"
-                className={`gothic-title text-xs sm:text-sm w-full sm:w-auto ${
-                  isSelected
-                    ? "bg-ember hover:bg-ember/80 text-white"
-                    : "border-accent text-accent hover:bg-accent/10"
-                }`}
-              >
-                {isSelected ? "Deselect" : "Select"}
-              </Button>
+              {!disableButton ? (
+                <Button
+                  onClick={() => setShowModal(true)}
+                  variant={isSelected ? "default" : "outline"}
+                  size="sm"
+                  className={`gothic-title text-xs sm:text-sm w-full sm:w-auto ${
+                    isSelected
+                      ? "bg-ember hover:bg-ember/80 text-white"
+                      : "border-accent text-accent hover:bg-accent/10"
+                  }`}
+                >
+                  {isSelected ? "Deselect" : "Select"}
+                </Button>
+              ) : weeklyFlamePass ? (
+                <Button
+                  onClick={() => {
+                    setShowModal(true);
+                    setIsFlamePassUsage(true);
+                  }}
+                  disabled={false}
+                  variant="outline"
+                  size="sm"
+                  className="gothic-title text-xs sm:text-sm w-full sm:w-auto border-accent text-accent hover:bg-accent/10"
+                >
+                  Use Flame Pass
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => setShowModal(true)}
+                  disabled
+                  variant="outline"
+                  size="sm"
+                  className="gothic-title text-xs sm:text-sm w-full sm:w-auto border-accent text-accent/50"
+                >
+                  Select
+                </Button>
+              )}
             </div>
           )}
         </div>
@@ -137,7 +185,10 @@ export function LetterDisplay({
         setShowModal={setShowModal}
         showModal={showModal}
         isSelected={isSelected}
-        confirmAction={selectLetterHandler}
+        confirmAction={
+          isFlamePassUsage ? flamePassUsageHandler : selectLetterHandler
+        }
+        isFlamePassUsage={isFlamePassUsage}
       />
     </div>
   );

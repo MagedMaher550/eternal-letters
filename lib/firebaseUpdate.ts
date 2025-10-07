@@ -11,12 +11,6 @@ export const selectLetterFirebase = async (
     week: number
 ) => {
 
-    console.log(letterId)
-
-    console.log(sender)
-
-    console.log(week)
-
 
     const updatedObject = currentUser === 'maged' ? { isSelectedByMaged: true } : { isSelectedByAlyana: true }
     const datePart = getDatePart(letterId);

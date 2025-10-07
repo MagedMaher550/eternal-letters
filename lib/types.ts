@@ -22,7 +22,18 @@ export interface ProfileMetrics {
     currentWeek: number;           // Current week number based on letters
     flamePassesEarned: number;     // Total Flame Passes earned
     flamePassesUsed: number;       // Total Flame Passes used
+    userFlames: FlamePass[];       // User's Flame Passes data
 }
 
 
 export type User = "maged" | "alyana"
+
+export interface FlamePass {
+    id: string,
+    createdAt: Date,
+    expiresAt: Date,
+    for: 'maged' | "alyana",
+    reason: string,
+    used: boolean,
+    weekNumber: number
+}

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { LetterDisplay } from "./letter-display";
 import { WeeklyDivider } from "./weekly-divider";
 import { Button } from "@/components/ui/button";
-import { Letter } from "@/lib/types";
+import { FlamePass, Letter } from "@/lib/types";
 import { getCurrentWeekNumber } from "@/lib/utils";
 
 interface WeeklySectionProps {
@@ -15,10 +15,8 @@ interface WeeklySectionProps {
   alyanaSelectedLetter?: Letter | undefined;
   magedSelectedLetter?: Letter | undefined;
   onLetterSelect?: (letterId: string) => void;
-  hasFlamePassSelection?: boolean;
-  canUseFlamePass?: boolean;
-  onUseFlamePass?: () => void;
   currentUser: string;
+  flamePasses: FlamePass[];
 }
 
 export function WeeklySection({
@@ -29,10 +27,8 @@ export function WeeklySection({
   magedSelectedLetter,
   alyanaSelectedLetter,
   onLetterSelect,
-  hasFlamePassSelection = false,
-  canUseFlamePass = false,
-  onUseFlamePass,
   currentUser,
+  flamePasses,
 }: WeeklySectionProps) {
   const [isExpanded, setIsExpanded] = useState(isCurrentWeek);
 
@@ -46,6 +42,15 @@ export function WeeklySection({
       ) =>
         currentUser === "maged" ? l.isSelectedByMaged : l.isSelectedByAlyana
     );
+
+  const hasFlamePassSelection = flamePasses.some(
+    (fp) =>
+      fp.for === currentUser && fp.used && fp.weekNumber === currentWeekNumber
+  );
+
+  const weeklyFlamePass = flamePasses.find(
+    (fp) => fp.for === currentUser && !fp.used
+  );
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -94,6 +99,7 @@ export function WeeklySection({
                   currentUser={currentUser}
                   isSelectionLocked={isWeekLocked}
                   weekNumber={weekNumber}
+                  weeklyFlamePass={weeklyFlamePass}
                 />
               );
             })}
@@ -114,30 +120,30 @@ export function WeeklySection({
               {canSelectLetters && (
                 <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-3">
                   {magedSelectedLetter || alyanaSelectedLetter ? (
-                    <span className="text-xs sm:text-sm text-ember font-medium">
-                      {hasFlamePassSelection
-                        ? "Flame Pass selection"
-                        : `Letter${
-                            magedSelectedLetter && alyanaSelectedLetter
-                              ? "s"
-                              : ""
-                          } selected for discussion`}
-                    </span>
+                    <>
+                      {/* Letters selection info */}
+                      <span className="text-xs sm:text-sm text-ember font-medium">
+                        {magedSelectedLetter || alyanaSelectedLetter
+                          ? `Letter${
+                              magedSelectedLetter && alyanaSelectedLetter
+                                ? "s"
+                                : ""
+                            } selected for discussion`
+                          : "No letters selected"}
+                      </span>
+
+                      {/* Flame Pass usage info */}
+                      {hasFlamePassSelection && (
+                        <span className="text-xs sm:text-sm text-amber-500 font-medium">
+                          Flame Pass used for selection
+                        </span>
+                      )}
+                    </>
                   ) : (
                     <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
                       <span className="text-xs sm:text-sm text-muted-foreground">
                         No letter selected
                       </span>
-                      {canUseFlamePass && (
-                        <Button
-                          onClick={onUseFlamePass}
-                          size="sm"
-                          variant="outline"
-                          className="border-ember text-ember hover:bg-ember/10 gothic-title bg-transparent text-xs sm:text-sm"
-                        >
-                          Use Flame Pass
-                        </Button>
-                      )}
                     </div>
                   )}
                 </div>

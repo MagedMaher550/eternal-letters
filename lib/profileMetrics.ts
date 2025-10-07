@@ -1,7 +1,7 @@
 // /lib/profileMetrics.ts
 import { ref, get } from "firebase/database";
 import { database } from "./firebase";
-import { Letter } from "./types";
+import { FlamePass, Letter } from "./types";
 
 
 
@@ -31,10 +31,12 @@ export interface ProfileMetrics {
     weeklyProgress: number;
     /** Current week number for the user */
     currentWeek: number;
-    /** Number of flame passes earned (currently placeholder) */
+    /** Number of flame passes earned  */
     flamePassesEarned: number;
-    /** Number of flame passes used (currently placeholder) */
+    /** Number of flame passes used  */
     flamePassesUsed: number;
+    /** user's flame pass data  */
+    userFlames: FlamePass[]
 }
 
 /**
@@ -61,6 +63,19 @@ export const fetchProfileMetrics = async (username: string): Promise<ProfileMetr
         const snapshot = await get(ref(database, "letters"));
         const data = snapshot.val() || {};
 
+        // flame passes fetching
+        const flamesSnapshot = await get(ref(database, "flamePasses"));
+        const flamesData: Record<string, Omit<FlamePass, "id">> = flamesSnapshot.val() || {};
+
+        const userFlames: (FlamePass & { id: string })[] = Object.entries(flamesData)
+            .map(([id, data]) => ({
+                id,
+                ...data,
+            }))
+            .filter(fp => fp.for === username);
+
+
+
 
         // Flatten *all* letters
         const letters: Letter[] = [];
@@ -85,7 +100,8 @@ export const fetchProfileMetrics = async (username: string): Promise<ProfileMetr
                 weeklyProgress: 0,
                 currentWeek: 0,
                 flamePassesEarned: 0,
-                flamePassesUsed: 0
+                flamePassesUsed: 0,
+                userFlames: []
             };
         }
 
@@ -168,9 +184,9 @@ export const fetchProfileMetrics = async (username: string): Promise<ProfileMetr
         // Selections made
         const selectionsMade = sortedLetters.filter(l => username === 'maged' ? l.isSelectedByMaged : l.isSelectedByAlyana).length;
 
-        // Flame passes (placeholders)
-        const flamePassesEarned = 0;
-        const flamePassesUsed = 0;
+        // Flame passes metrics
+        const flamePassesEarned = userFlames.length;
+        const flamePassesUsed = userFlames.filter(fp => fp.used).length;
 
         return {
             joinedDate,
@@ -185,7 +201,8 @@ export const fetchProfileMetrics = async (username: string): Promise<ProfileMetr
             weeklyProgress,
             currentWeek,
             flamePassesEarned,
-            flamePassesUsed
+            flamePassesUsed,
+            userFlames
         };
 
     } catch (err) {
@@ -205,7 +222,8 @@ export const fetchProfileMetrics = async (username: string): Promise<ProfileMetr
             weeklyProgress: 0,
             currentWeek: 0,
             flamePassesEarned: 0,
-            flamePassesUsed: 0
+            flamePassesUsed: 0,
+            userFlames: []
         };
     }
 };

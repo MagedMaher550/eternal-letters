@@ -8,9 +8,10 @@ import { AuthGuard } from "@/components/auth-guard";
 import { useAuth } from "@/contexts/auth-context";
 import { subscribeLetters } from "@/lib/firebaseListeners";
 import { writeLetter } from "@/lib/firebaseWrite";
-import { Letter } from "@/lib/types";
+import { FlamePass, Letter } from "@/lib/types";
 import BonfireLoader from "@/components/glowingFlameLoader";
 import { normalizeDate } from "@/lib/utils";
+import { getActiveFlamePasses } from "@/lib/firebaseFlamePasses";
 
 /**
  * HomePage component
@@ -25,6 +26,7 @@ export default function HomePage() {
   // Loading & letters state
   // -------------------------
   const [loading, setLoading] = useState<boolean>(true);
+  const [loadingFlamePasses, setLoadingFlamePasses] = useState<boolean>(true);
 
   /**
    * lettersByDate: Stores letters structured by date and user.
@@ -35,6 +37,7 @@ export default function HomePage() {
   const [lettersByDate, setLettersByDate] = useState<
     Record<string, Record<string, Letter>>
   >({});
+  const [flamePasses, setFlamePasses] = useState<FlamePass[]>([]);
 
   // -------------------------
   // Subscribe to Firebase letters
@@ -46,7 +49,15 @@ export default function HomePage() {
     });
   }, []);
 
-  console.log(lettersByDate)
+  useEffect(() => {
+    const fetchFlamePasses = async () => {
+      const fetchedFlamePasses = await getActiveFlamePasses();
+      setFlamePasses(fetchedFlamePasses);
+      setLoadingFlamePasses(false);
+    };
+
+    fetchFlamePasses();
+  }, []);
 
   // -------------------------
   // Determine if current user can write today
@@ -58,7 +69,8 @@ export default function HomePage() {
   const todayKey = normalizeDate(new Date()).toLocaleDateString("en-CA"); // YYYY-MM-DD
 
   // Determine if the user can write today
-  const canWriteToday = !loading && !lettersByDate[todayKey]?.[userKey];
+  const canWriteToday =
+    !loading && !loadingFlamePasses && !lettersByDate[todayKey]?.[userKey];
 
   // -------------------------
   // Flatten letters for weekly view (newest first)
@@ -139,7 +151,7 @@ export default function HomePage() {
       <div className="min-h-screen bg-background">
         <Navigation flamePasses={[]} />
 
-        {!loading ? (
+        {!loading && !loadingFlamePasses ? (
           <main className="container mx-auto px-2 sm:px-4 py-6 sm:py-8 max-w-4xl">
             {/* Header */}
             <div className="text-center mb-8 sm:mb-12">
@@ -191,10 +203,8 @@ export default function HomePage() {
                     magedSelectedLetter={magedSelectedLetter}
                     alyanaSelectedLetter={alyanaSelectedLetter}
                     onLetterSelect={handleLetterSelect(week)}
-                    hasFlamePassSelection={false} // Integrate flame pass logic later
-                    canUseFlamePass={false}
-                    onUseFlamePass={() => {}}
                     currentUser={currentUser!}
+                    flamePasses={flamePasses}
                   />
                 ) : (
                   <></>
