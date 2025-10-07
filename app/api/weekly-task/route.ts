@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { db } from "@/lib/firebase";
+import { database as db } from "@/lib/firebase";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
 
 // Core function to create a new weekly task
