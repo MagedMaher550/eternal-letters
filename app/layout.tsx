@@ -7,7 +7,6 @@ import { ThemeProvider } from "@/contexts/theme-context";
 import { SWRegister } from "@/components/sw-register";
 import { SettingsProvider } from "@/contexts/settings-context";
 import { EffectsRenderer } from "@/components/effects-renderer";
-import { SettingsDisplay } from "@/components/settings-display";
 import { Suspense } from "react";
 
 const cinzel = Cinzel({
@@ -61,15 +60,14 @@ export default function RootLayout({
       <body className="font-sans antialiased min-h-screen">
         <Suspense fallback={<div>Loading...</div>}>
           <ThemeProvider>
-            <SettingsProvider>
-              <AuthProvider>
+            <AuthProvider>
+              <SettingsProvider>
                 <EffectsRenderer />
 
                 {children}
                 <SWRegister />
-                <SettingsDisplay />
-              </AuthProvider>
-            </SettingsProvider>
+              </SettingsProvider>
+            </AuthProvider>
           </ThemeProvider>
         </Suspense>
       </body>

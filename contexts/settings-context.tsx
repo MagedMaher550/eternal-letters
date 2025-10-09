@@ -1,7 +1,6 @@
 "use client";
 
 import type React from "react";
-
 import {
   createContext,
   useContext,
@@ -10,30 +9,15 @@ import {
   useRef,
   type ReactNode,
 } from "react";
+import {
+  getUserSettings,
+  updateUserSettings,
+  initializeDefaultSettings,
+} from "@/lib/firebaseUserSettings";
+import { useAuth } from "./auth-context";
+import { UserSettings } from "@/lib/types";
 
-export interface Settings {
-  font: string;
-  musicTrack: string | null;
-  musicPlaying: boolean;
-  volume: number;
-  muted: boolean;
-  particleEffects: boolean;
-  cursorTrail: boolean;
-  soundEffects: boolean;
-  candleFlicker: boolean;
-  themeAccent: string;
-  dynamicBackground: string;
-  cursorStyle: string;
-  darkModeIntensity: number;
-  runeSeals: boolean;
-  scrollAnimation: boolean;
-  hapticFeedback: boolean;
-  reducedMotion: boolean;
-  themePreset: string;
-  textSize: number;
-}
-
-const DEFAULT_SETTINGS: Settings = {
+const DEFAULT_SETTINGS: UserSettings = {
   font: "Cinzel, serif",
   musicTrack: null,
   musicPlaying: false,
@@ -56,12 +40,12 @@ const DEFAULT_SETTINGS: Settings = {
 };
 
 interface SettingsContextType {
-  settings: Settings;
-  updateSettings: (updates: Partial<Settings>) => void;
+  settings: UserSettings;
+  updateSettings: (updates: Partial<UserSettings>) => void;
   audioRef: React.RefObject<HTMLAudioElement>;
   playSound: (soundType: string) => void;
   isMobile: boolean;
-  allSettings: Settings;
+  allSettings: UserSettings;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(
@@ -69,81 +53,124 @@ const SettingsContext = createContext<SettingsContextType | undefined>(
 );
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
-  const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
+  const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
   const [isClient, setIsClient] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [firebaseLoaded, setFirebaseLoaded] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+  const { currentUser } = useAuth();
 
+  // Detect client and device type
   useEffect(() => {
     setIsClient(true);
-    const checkMobile = () => {
+    const checkMobile = () =>
       setIsMobile(window.innerWidth < 1024 || "ontouchstart" in window);
-    };
     checkMobile();
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  // Load settings from localStorage on mount
+  // Load settings when user is ready
   useEffect(() => {
-    const stored = localStorage.getItem("eternal-letters-settings");
-    if (stored) {
+    if (!currentUser) return; // Wait until user is known
+
+    const loadSettings = async () => {
       try {
-        const parsed = JSON.parse(stored);
-        setSettings({ ...DEFAULT_SETTINGS, ...parsed });
-      } catch (e) {
-        console.error("[v0] Failed to parse settings:", e);
+        const firebaseSettings = await getUserSettings(currentUser);
+        if (firebaseSettings) {
+          setSettings({ ...DEFAULT_SETTINGS, ...firebaseSettings });
+          console.log("[Firebase] Settings loaded:", firebaseSettings);
+        } else {
+          console.log("[Firebase] No settings found, initializing defaults.");
+          await initializeDefaultSettings(currentUser);
+        }
+      } catch (err) {
+        console.error("[Firebase] Failed to load settings:", err);
+        const stored = localStorage.getItem("eternal-letters-settings");
+        if (stored) setSettings({ ...DEFAULT_SETTINGS, ...JSON.parse(stored) });
+      } finally {
+        setFirebaseLoaded(true);
+      }
+    };
+
+    loadSettings();
+  }, [currentUser]);
+
+  // handle background audio
+  useEffect(() => {
+    if (!audioRef.current || !isClient) return
+
+    const audio = audioRef.current
+
+    if (settings.musicTrack) {
+      audio.src = `/audio/${settings.musicTrack}.mp3`
+      audio.volume = settings.volume / 100
+      audio.muted = settings.muted
+      audio.loop = true
+
+      if (settings.musicPlaying) {
+        audio.play().catch((err) => {
+          console.log("[v0] Audio autoplay blocked, user interaction required:", err)
+        })
+      } else {
+        audio.pause()
       }
     }
-  }, []);
+  }, [settings.musicTrack, settings.musicPlaying, isClient])
 
-  // Save settings to localStorage whenever they change
   useEffect(() => {
-    if (isClient) {
+    if (audioRef.current) {
+      audioRef.current.volume = settings.volume / 100
+      audioRef.current.muted = settings.muted
+    }
+  }, [settings.volume, settings.muted])
+
+  // Persist settings after load
+  useEffect(() => {
+    if (isClient && firebaseLoaded && currentUser) {
       localStorage.setItem(
         "eternal-letters-settings",
         JSON.stringify(settings)
       );
-      console.log("[v0] Settings updated:", settings);
+      updateUserSettings(currentUser, settings)
+        .then(() => console.log("[Firebase] Settings updated"))
+        .catch((e) => console.error("[Firebase] Failed to sync settings:", e));
     }
-  }, [settings, isClient]);
+  }, [settings, isClient, firebaseLoaded, currentUser]);
 
-  // Apply font globally
+  // Apply font dynamically
   useEffect(() => {
     if (isClient) {
       document.documentElement.style.setProperty(
-        "--font-custom",
+        "--handwritten-font",
         settings.font
       );
     }
   }, [settings.font, isClient]);
 
-  // Apply dark mode intensity
+  // Apply other reactive UI variables
   useEffect(() => {
     if (isClient) {
-      const intensity = settings.darkModeIntensity / 100;
       document.documentElement.style.setProperty(
         "--dark-intensity",
-        intensity.toString()
+        (settings.darkModeIntensity / 100).toString()
       );
     }
   }, [settings.darkModeIntensity, isClient]);
 
   useEffect(() => {
     if (isClient) {
-      const accentColors: {
-        [key: string]: { primary: string; light: string; dark: string };
-      } = {
+      const accents: Record<
+        string,
+        { primary: string; light: string; dark: string }
+      > = {
         amber: { primary: "#f59e0b", light: "#fbbf24", dark: "#d97706" },
         blue: { primary: "#3b82f6", light: "#60a5fa", dark: "#2563eb" },
         red: { primary: "#dc2626", light: "#ef4444", dark: "#b91c1c" },
         emerald: { primary: "#10b981", light: "#34d399", dark: "#059669" },
         purple: { primary: "#a855f7", light: "#c084fc", dark: "#9333ea" },
       };
-
-      const colors = accentColors[settings.themeAccent] || accentColors.amber;
-
-      // Apply multiple CSS variables for comprehensive theming
+      const colors = accents[settings.themeAccent] || accents.amber;
       document.documentElement.style.setProperty(
         "--theme-accent",
         colors.primary
@@ -156,16 +183,10 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         "--theme-accent-dark",
         colors.dark
       );
-      document.documentElement.setAttribute(
-        "data-theme-accent",
-        settings.themeAccent
-      );
-
-      console.log("[v0] Theme accent applied:", settings.themeAccent, colors);
     }
   }, [settings.themeAccent, isClient]);
 
-  // Apply cursor style
+  // Cursor & text scale
   useEffect(() => {
     if (isClient && !isMobile) {
       document.documentElement.setAttribute(
@@ -175,7 +196,6 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     }
   }, [settings.cursorStyle, isClient, isMobile]);
 
-  // Apply text size
   useEffect(() => {
     if (isClient) {
       document.documentElement.style.setProperty(
@@ -185,75 +205,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     }
   }, [settings.textSize, isClient]);
 
-  // Apply theme presets
-  useEffect(() => {
-    if (isClient && settings.themePreset !== "default") {
-      const presets: { [key: string]: Partial<Settings> } = {
-        minimal: {
-          particleEffects: false,
-          cursorTrail: false,
-          candleFlicker: false,
-          dynamicBackground: "none",
-        },
-        immersive: {
-          particleEffects: true,
-          cursorTrail: true,
-          candleFlicker: true,
-          dynamicBackground: "embers",
-        },
-        performance: {
-          particleEffects: false,
-          cursorTrail: false,
-          candleFlicker: false,
-          dynamicBackground: "none",
-          reducedMotion: true,
-        },
-      };
-
-      if (presets[settings.themePreset]) {
-        setSettings((prev) => ({ ...prev, ...presets[settings.themePreset] }));
-      }
-    }
-  }, [settings.themePreset, isClient]);
-
-  useEffect(() => {
-    if (!audioRef.current || !isClient) return;
-
-    const audio = audioRef.current;
-
-    if (settings.musicTrack) {
-      audio.src = `/audio/${settings.musicTrack}.mp3`;
-      audio.volume = settings.volume / 100;
-      audio.muted = settings.muted;
-      audio.loop = true;
-
-      if (settings.musicPlaying) {
-        audio.play().catch((err) => {
-          console.log(
-            "[v0] Audio autoplay blocked, user interaction required:",
-            err
-          );
-        });
-      } else {
-        audio.pause();
-      }
-    }
-  }, [settings.musicTrack, settings.musicPlaying, isClient]);
-
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = settings.volume / 100;
-      audioRef.current.muted = settings.muted;
-    }
-  }, [settings.volume, settings.muted]);
-
-  const updateSettings = (updates: Partial<Settings>) => {
-    setSettings((prev) => {
-      const newSettings = { ...prev, ...updates };
-      console.log("[v0] Setting changed:", updates);
-      return newSettings;
-    });
-
+  const updateSettings = (updates: Partial<UserSettings>) => {
+    setSettings((prev) => ({ ...prev, ...updates }));
     if (
       isMobile &&
       updates &&
@@ -266,7 +219,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
   const playSound = (soundType: string) => {
     if (!settings.soundEffects || !isClient) return;
-    // User needs to add actual MP3 files to /public/sounds/
+    // Placeholder for future sound logic
   };
 
   return (
@@ -288,8 +241,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
 
 export function useSettings() {
   const context = useContext(SettingsContext);
-  if (!context) {
+  if (!context)
     throw new Error("useSettings must be used within SettingsProvider");
-  }
   return context;
 }
