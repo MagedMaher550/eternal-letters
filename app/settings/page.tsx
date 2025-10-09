@@ -19,8 +19,14 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { ScrollEdge } from "@/components/scroll-edge";
 import { useSettings } from "@/contexts/settings-context";
+import { Navigation } from "@/components/navigation";
 
 const FANTASY_FONTS = [
+  {
+    name: "Brush Script MT",
+    value: '"Brush Script MT", cursive',
+    preview: "Handwritten Whispers of the Flame",
+  },
   {
     name: "Cinzel",
     value: "Cinzel, serif",
@@ -70,6 +76,11 @@ const FANTASY_FONTS = [
     name: "Libre Baskerville",
     value: "Libre Baskerville, serif",
     preview: "Timeless Wisdom Preserved",
+  },
+  {
+    name: "Dancing Script",
+    value: '"Dancing Script", cursive',
+    preview: "Soft Ink of Eternal Stories",
   },
 ];
 
@@ -197,71 +208,7 @@ export default function SettingsPage() {
       }}
     >
       {/* Navigation */}
-      <nav className="border-b border-purple-900/30 bg-[#0f0f1a]/80 backdrop-blur-sm">
-        <div className="container mx-auto flex items-center justify-between px-4 py-4">
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors"
-          >
-            <Flame className="h-5 w-5" />
-            <span className="font-serif text-lg">Eternal Letters</span>
-          </Link>
-          <div className="hidden md:flex items-center gap-6">
-            <Link
-              href="/letters"
-              className="text-sm text-purple-300 hover:text-purple-200 transition-colors"
-            >
-              Letters
-            </Link>
-            <Link
-              href="/rules"
-              className="text-sm text-purple-300 hover:text-purple-200 transition-colors"
-            >
-              Rules
-            </Link>
-            <Link
-              href="/lore"
-              className="text-sm text-purple-300 hover:text-purple-200 transition-colors"
-            >
-              Lore
-            </Link>
-            <Link
-              href="/profile"
-              className="text-sm text-purple-300 hover:text-purple-200 transition-colors"
-            >
-              Profile
-            </Link>
-            <Link
-              href="/settings"
-              className="text-sm text-purple-400 hover:text-purple-300 transition-colors relative"
-            >
-              <svg
-                className={`h-5 w-5 ${
-                  settings.particleEffects || settings.cursorTrail
-                    ? "animate-pulse"
-                    : ""
-                }`}
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <Navigation />
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 md:py-12">
