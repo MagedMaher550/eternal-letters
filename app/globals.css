@@ -5,7 +5,7 @@
 @custom-variant light (&:is(.light *));
 
 :root {
-  /* Updated to use more vibrant light theme colors */
+  /* Merged user's light theme colors with settings system */
   --background: #faf8f2;
   --foreground: #1a0f08;
   --card: #ffffff;
@@ -48,10 +48,12 @@
   --parchment-dark: #f5f1e8;
   --shadow-deep: #00000030;
   --rune-glow: #ffd700;
+  --font-custom: "Cinzel", serif;
+  --theme-accent: #f59e0b;
 }
 
 .light {
-  /* Updated light theme with more vibrant colors */
+  /* User's light theme preserved */
   --background: #faf8f2;
   --foreground: #1a0f08;
   --card: #ffffff;
@@ -93,7 +95,7 @@
 }
 
 .dark {
-  /* Updated dark theme with richer, more vibrant colors */
+  /* User's dark theme preserved */
   --background: #0d0a0f;
   --foreground: #e6d7ff;
   --card: #1a1625;
@@ -135,7 +137,6 @@
 }
 
 @theme inline {
-  /* optional: --font-sans, --font-serif, --font-mono if they are applied in the layout.tsx */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -195,7 +196,7 @@ body {
   overflow-x: hidden;
 }
 
-/* Floating ember particles animation */
+/* User's floating ember particles preserved */
 body::before {
   content: "";
   position: fixed;
@@ -229,7 +230,7 @@ body::before {
   }
 }
 
-/* Updated parchment texture with new color scheme */
+/* User's parchment texture preserved */
 .parchment {
   background: linear-gradient(
     45deg,
@@ -254,7 +255,7 @@ body::before {
   z-index: -1;
 }
 
-/* Torn edges effect */
+/* User's torn edges effect preserved */
 .torn-edges {
   position: relative;
 }
@@ -272,7 +273,7 @@ body::before {
   pointer-events: none;
 }
 
-/* Glowing ember effect for flame passes */
+/* User's ember glow effect preserved */
 .ember-glow {
   color: var(--ember);
   text-shadow: 0 0 10px var(--ember-glow);
@@ -288,7 +289,7 @@ body::before {
   }
 }
 
-/* Updated wax seal with new color scheme */
+/* User's wax seal preserved */
 .wax-seal {
   width: 40px;
   height: 40px;
@@ -309,7 +310,7 @@ body::before {
   text-shadow: 0 1px 2px var(--shadow-deep);
 }
 
-/* Burned scroll divider */
+/* User's burned scroll divider preserved */
 .burned-scroll {
   background: linear-gradient(
     90deg,
@@ -341,7 +342,7 @@ body::before {
   right: 20%;
 }
 
-/* Gothic text styling */
+/* User's gothic title styling preserved */
 .gothic-title {
   font-family: var(--font-serif);
   font-weight: 700;
@@ -349,12 +350,17 @@ body::before {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
+/* === Dynamic Handwritten Font Support === */
+:root {
+  --handwritten-font: "Brush Script MT", cursive;
+}
+
 .handwritten {
-  font-family: "Brush Script MT", cursive;
+  font-family: var(--handwritten-font);
   font-style: italic;
 }
 
-/* Rune glow effect */
+/* User's rune glow effect preserved */
 .rune-glow {
   color: var(--rune-glow);
   text-shadow: 0 0 15px var(--rune-glow);
@@ -372,6 +378,158 @@ body::before {
 }
 
 .purple-glow {
-  color: #a855f7; /* Tailwind purple-500 */
+  color: #a855f7;
   text-shadow: 0 0 6px #a855f7, 0 0 12px #9333ea, 0 0 18px #7e22ce;
+}
+
+/* Added settings system cursor styles */
+[data-cursor-style="rune"] * {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23f59e0b" stroke-width="2"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>')
+      12 12,
+    auto !important;
+}
+
+[data-cursor-style="flame"] * {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="24" viewBox="0 0 20 24"><path d="M10 2C10 2 6 8 6 12C6 15.314 7.791 18 10 18C12.209 18 14 15.314 14 12C14 8 10 2 10 2Z" fill="%23fb923c" opacity="0.8"/><path d="M10 6C10 6 8 9 8 11C8 12.657 8.895 14 10 14C11.105 14 12 12.657 12 11C12 9 10 6 10 6Z" fill="%23fbbf24"/></svg>')
+      10 12,
+    auto !important;
+}
+
+[data-cursor-style="orb"] * {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="%23fbbf24" opacity="0.6"/><circle cx="10" cy="10" r="4" fill="%23f59e0b"/></svg>')
+      10 10,
+    auto !important;
+}
+
+[data-cursor-style="cross"] * {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23a855f7" stroke-width="2"><path d="M12 2v20M2 12h20"/></svg>')
+      12 12,
+    auto !important;
+}
+
+/* Added theme accent system */
+[data-theme-accent="amber"] {
+  --accent-primary: #f59e0b;
+  --accent-secondary: #fbbf24;
+  --accent-glow: rgba(245, 158, 11, 0.3);
+}
+
+[data-theme-accent="blue"] {
+  --accent-primary: #3b82f6;
+  --accent-secondary: #60a5fa;
+  --accent-glow: rgba(59, 130, 246, 0.3);
+}
+
+[data-theme-accent="red"] {
+  --accent-primary: #dc2626;
+  --accent-secondary: #ef4444;
+  --accent-glow: rgba(220, 38, 38, 0.3);
+}
+
+[data-theme-accent="emerald"] {
+  --accent-primary: #10b981;
+  --accent-secondary: #34d399;
+  --accent-glow: rgba(16, 185, 129, 0.3);
+}
+
+[data-theme-accent="purple"] {
+  --accent-primary: #a855f7;
+  --accent-secondary: #c084fc;
+  --accent-glow: rgba(168, 85, 247, 0.3);
+}
+
+/* Apply accent colors to user's existing classes */
+[data-theme-accent] .text-primary,
+[data-theme-accent] h1.text-primary {
+  color: var(--accent-primary) !important;
+}
+
+[data-theme-accent] .bg-primary {
+  background-color: var(--accent-primary) !important;
+}
+
+[data-theme-accent] .border-primary {
+  border-color: var(--accent-primary) !important;
+}
+
+/* Added candle flicker animation for settings */
+@keyframes candle-flicker {
+  0%,
+  100% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  25% {
+    opacity: 0.95;
+    filter: brightness(0.98);
+  }
+  50% {
+    opacity: 0.92;
+    filter: brightness(0.95);
+  }
+  75% {
+    opacity: 0.97;
+    filter: brightness(0.99);
+  }
+}
+
+.animate-candle {
+  animation: candle-flicker 2s ease-in-out infinite;
+}
+
+/* Added rune seal hover effect for settings */
+@keyframes rune-appear {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) rotate(-20deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2) rotate(5deg);
+  }
+  100% {
+    opacity: 0.8;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+[data-rune-seals="true"] button:hover::after,
+[data-rune-seals="true"] a:hover::after {
+  content: "✦";
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: 18px;
+  color: var(--accent-primary, #f59e0b);
+  animation: rune-appear 0.5s ease-out;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Added scroll unfurl animation for settings */
+@keyframes scroll-unfurl {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translateY(-20px);
+    filter: blur(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+  }
+}
+
+.scroll-unfurl {
+  animation: scroll-unfurl 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Mobile responsive improvements */
+@media (max-width: 768px) {
+  [data-cursor-style="rune"] *,
+  [data-cursor-style="flame"] *,
+  [data-cursor-style="orb"] *,
+  [data-cursor-style="cross"] * {
+    cursor: auto !important;
+  }
 }

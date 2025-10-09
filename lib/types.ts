@@ -37,3 +37,25 @@ export interface FlamePass {
     used: boolean,
     weekNumber: number
 }
+
+export interface UserSettings {
+    font: string;
+    musicTrack: string | null;
+    musicPlaying: boolean;
+    volume: number;
+    muted: boolean;
+    particleEffects: boolean;
+    cursorTrail: boolean;
+    soundEffects: boolean;
+    candleFlicker: boolean;
+    themeAccent: string;
+    dynamicBackground: string;
+    cursorStyle: string;
+    darkModeIntensity: number;
+    runeSeals: boolean;
+    scrollAnimation: boolean;
+    hapticFeedback: boolean;
+    reducedMotion: boolean;
+    themePreset: string;
+    textSize: number;
+}
